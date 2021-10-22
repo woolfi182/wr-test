@@ -1,12 +1,14 @@
 import { NestFactory } from "@nestjs/core";
 
 import { AppModule } from "./app.module";
+import { AppConfigService } from "./configs/app/app.service";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const appConfig = app.get(AppConfigService);
 
-  await app.listen(3000, async () => {
-    console.log(`[ SERVER ] Ready on localhost:${3000}`);
+  await app.listen(appConfig.port, async () => {
+    console.log(`[ SERVER ] Ready on localhost:${appConfig.port}`);
   });
 }
 
