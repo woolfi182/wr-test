@@ -1,14 +1,15 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, VersioningType } from "@nestjs/common";
 import * as request from "supertest";
-import { AppModule } from "./../src/app.module";
 
-describe("AppController (e2e)", () => {
+import { TitleModule } from "../src/modules/title/title.module";
+
+describe("TitleController (e2e)", () => {
   let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [TitleModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -16,6 +17,7 @@ describe("AppController (e2e)", () => {
     app.enableVersioning({
       type: VersioningType.URI,
     });
+
     await app.init();
   });
 
