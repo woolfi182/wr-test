@@ -1,25 +1,50 @@
-import { Body, Controller, Post, VERSION_NEUTRAL } from "@nestjs/common";
-import { ApiOkResponse } from "@nestjs/swagger";
+import {
+  Body,
+  Controller,
+  Post,
+  ValidationPipe,
+  VERSION_NEUTRAL,
+} from "@nestjs/common";
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiOperation,
+  ApiTags,
+} from "@nestjs/swagger";
+
 import { ProcessTextInput } from "./input";
 import { EProcessTextStatus, ProcessTextOutput } from "./output";
 import { TitleService } from "./title.service";
 
+@ApiTags("Generate Title")
 @Controller({
   path: "title",
   version: VERSION_NEUTRAL,
 })
 export class TitleController {
-  constructor(private readonly titleSrvs: TitleService) {}
+  constructor(private readonly titleService: TitleService) {}
 
   @Post()
-  @ApiOkResponse({
-    status: 201,
-    description: "Success response",
+  @ApiOperation({ summary: "Generate title using OpenAI" })
+  @ApiCreatedResponse({
+    description: "Successful response",
+  })
+  @ApiBadRequestResponse({
+    description: "Provided data is not valid",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Internal server error",
+  })
+  @ApiBody({
+    type: ProcessTextInput,
+    required: true,
   })
   async processText(
-    @Body() body: ProcessTextInput,
+    @Body(new ValidationPipe()) body: ProcessTextInput,
   ): Promise<ProcessTextOutput> {
-    const title = await this.titleSrvs.getTitle(body.data);
+    const title = await this.titleService.getTitle(body.data);
     return {
       title,
       status: EProcessTextStatus.COMPLETED,
