@@ -19,17 +19,16 @@ describe("AppController (e2e)", () => {
     await app.init();
   });
 
-  it("/v1/ (GET)", () => {
+  it("/title (POST)", () => {
     return request(app.getHttpServer())
-      .get("/v1/")
-      .expect(200)
-      .expect("Hello World! (version: v1)");
-  });
-
-  it("/v2/ (GET)", () => {
-    return request(app.getHttpServer())
-      .get("/v2/")
-      .expect(200)
-      .expect("Hello World! (version: v2)");
+      .post("/title")
+      .set("Accept", "application/json")
+      .expect("Content-Type", /json/)
+      .send({ data: "any chunk data" })
+      .expect(201)
+      .expect({
+        title: "Here is a title",
+        status: "completed",
+      });
   });
 });
