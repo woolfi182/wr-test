@@ -14,6 +14,7 @@ import { AppConfigService } from "./app.service";
           .valid("development", "test", "production", "provision")
           .default("development"),
         APP_PORT: Joi.number().default(3000),
+        OPENAI_API_KEY: Joi.string().required(),
       }),
     }),
   ],

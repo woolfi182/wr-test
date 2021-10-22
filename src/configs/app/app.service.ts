@@ -20,6 +20,10 @@ export class AppConfigService {
     return this.configService.get<number>("app.port");
   }
 
+  get openaiApiKey(): string {
+    return this.configService.get<string>("app.openaiApiKey");
+  }
+
   /**
    * Chech if the ENV is prod-like
    * @returns true/false
