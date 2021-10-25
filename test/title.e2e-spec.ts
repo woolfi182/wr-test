@@ -64,9 +64,8 @@ describe("TitleController (e2e)", () => {
         .set("Accept", "application/json")
         .expect("Content-Type", /json/)
         .send(data)
-        .expect(201)
+        .expect(200)
         .expect({
-          title: "Here is a title",
           status: "queued",
         });
     });

@@ -19,10 +19,10 @@ describe("TitleController", () => {
       const body = {
         data: "any data",
       };
-      const res = await titleController.processText(body);
+      const res = await titleController.handleDataForTitle(body);
       expect(res).toStrictEqual({
-        title: "Here is a title",
         status: "queued",
+        title: undefined,
       });
     });
   });

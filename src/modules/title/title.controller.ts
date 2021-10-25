@@ -24,6 +24,7 @@ import {
   InternalServerErrorOutput,
   DataForTitleOutput,
 } from "./output";
+import { generateUniqueHash } from "../../helpers/hash";
 
 @ApiTags("Generate Title")
 @Controller({
@@ -58,10 +59,12 @@ export class TitleController {
   async handleDataForTitle(
     @Body(new ValidationPipe()) body: DataForTitleInput,
   ): Promise<DataForTitleOutput> {
+    // To make search faster, let's generate hashes
+    const uniqueName = await generateUniqueHash(body.data);
+
     // Check whether we have processed the chunk before
     // If so, there is nothing to do here
-    // TODO: improve speed via hashes
-    const processedData = await this.titleService.getTitleData(body.data);
+    const processedData = await this.titleService.getTitleData(uniqueName);
     if (processedData) {
       return {
         status: processedData.status as EProcessingStatus,
@@ -70,7 +73,7 @@ export class TitleController {
     }
 
     // Chunk has newer been handeled before
-    await this.titleService.saveDataForTitle(body.data);
+    await this.titleService.saveDataForTitle(uniqueName, body.data);
     return {
       status: EProcessingStatus.QUEUED,
     };
