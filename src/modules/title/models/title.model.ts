@@ -12,6 +12,7 @@ export class Title {
   @Prop({
     required: true,
     index: true,
+    unique: true,
   })
   hash: string;
 
