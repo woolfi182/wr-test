@@ -18,18 +18,18 @@ export class BadRequestOutput {
   @ApiProperty({
     example: 400,
   })
-  statusCode: number;
+  statusCode!: number;
 
   @ArrayMinSize(1)
   @ApiProperty({
     example: ["data should not be empty"],
   })
-  message: string[];
+  message!: string[];
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
     example: "Bad Request",
   })
-  error: string;
+  error!: string;
 }

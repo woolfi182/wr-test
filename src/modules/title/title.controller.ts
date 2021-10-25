@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpCode,
   Post,
   ValidationPipe,
   VERSION_NEUTRAL,
@@ -8,20 +9,21 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
-  ApiCreatedResponse,
+  ApiOkResponse,
   ApiInternalServerErrorResponse,
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
 
-import { ProcessTextInput } from "./input";
+import { TitleService } from "./title.service";
+
+import { DataForTitleInput } from "./input";
 import {
   BadRequestOutput,
-  EProcessTextStatus,
+  EProcessingStatus,
   InternalServerErrorOutput,
-  ProcessTextOutput,
+  DataForTitleOutput,
 } from "./output";
-import { TitleService } from "./title.service";
 
 @ApiTags("Generate Title")
 @Controller({
@@ -31,11 +33,15 @@ import { TitleService } from "./title.service";
 export class TitleController {
   constructor(private readonly titleService: TitleService) {}
 
+  /**
+   * Process text for generating title handler
+   */
   @Post()
+  @HttpCode(200)
   @ApiOperation({ summary: "Generate title using OpenAI" })
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description: "Successful response",
-    type: ProcessTextOutput,
+    type: DataForTitleOutput,
   })
   @ApiBadRequestResponse({
     description: "Provided data is not valid",
@@ -46,16 +52,27 @@ export class TitleController {
     type: InternalServerErrorOutput,
   })
   @ApiBody({
-    type: ProcessTextInput,
+    type: DataForTitleInput,
     required: true,
   })
-  async processText(
-    @Body(new ValidationPipe()) body: ProcessTextInput,
-  ): Promise<ProcessTextOutput> {
-    const title = await this.titleService.getTitle(body.data);
+  async handleDataForTitle(
+    @Body(new ValidationPipe()) body: DataForTitleInput,
+  ): Promise<DataForTitleOutput> {
+    // Check whether we have processed the chunk before
+    // If so, there is nothing to do here
+    // TODO: improve speed via hashes
+    const processedData = await this.titleService.getTitleData(body.data);
+    if (processedData) {
+      return {
+        status: processedData.status as EProcessingStatus,
+        title: processedData.title,
+      };
+    }
+
+    // Chunk has newer been handeled before
+    await this.titleService.saveDataForTitle(body.data);
     return {
-      title,
-      status: EProcessTextStatus.QUEUED,
+      status: EProcessingStatus.QUEUED,
     };
   }
 }

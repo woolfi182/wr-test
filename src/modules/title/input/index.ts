@@ -1,1 +1,1 @@
-export * from "./processText.input";
+export * from "./data-for-title.input";

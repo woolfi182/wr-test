@@ -14,12 +14,12 @@ export class InternalServerErrorOutput {
   @ApiProperty({
     example: 500,
   })
-  statusCode: number;
+  statusCode!: number;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
     example: "Internal server error",
   })
-  message: string;
+  message!: string;
 }

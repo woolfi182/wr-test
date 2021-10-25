@@ -1,24 +1,24 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsNotEmpty, IsString } from "class-validator";
 
-export enum EProcessTextStatus {
+export enum EProcessingStatus {
   COMPLETED = "completed",
   ERROR = "error",
   QUEUED = "queued",
 }
 
-export class ProcessTextOutput {
+export class DataForTitleOutput {
   @IsString()
   @ApiPropertyOptional({
     example: "Heros could fly",
   })
-  title: string;
+  title?: string;
 
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
-    enum: EProcessTextStatus,
+    enum: EProcessingStatus,
     required: true,
   })
-  status: EProcessTextStatus;
+  status!: EProcessingStatus;
 }
