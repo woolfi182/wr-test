@@ -22,7 +22,7 @@ describe("TitleController", () => {
       const res = await titleController.processText(body);
       expect(res).toStrictEqual({
         title: "Here is a title",
-        status: "completed",
+        status: "queued",
       });
     });
   });

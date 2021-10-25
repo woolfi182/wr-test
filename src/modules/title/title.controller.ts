@@ -15,7 +15,12 @@ import {
 } from "@nestjs/swagger";
 
 import { ProcessTextInput } from "./input";
-import { EProcessTextStatus, ProcessTextOutput } from "./output";
+import {
+  BadRequestOutput,
+  EProcessTextStatus,
+  InternalServerErrorOutput,
+  ProcessTextOutput,
+} from "./output";
 import { TitleService } from "./title.service";
 
 @ApiTags("Generate Title")
@@ -30,12 +35,15 @@ export class TitleController {
   @ApiOperation({ summary: "Generate title using OpenAI" })
   @ApiCreatedResponse({
     description: "Successful response",
+    type: ProcessTextOutput,
   })
   @ApiBadRequestResponse({
     description: "Provided data is not valid",
+    type: BadRequestOutput,
   })
   @ApiInternalServerErrorResponse({
     description: "Internal server error",
+    type: InternalServerErrorOutput,
   })
   @ApiBody({
     type: ProcessTextInput,
@@ -47,7 +55,7 @@ export class TitleController {
     const title = await this.titleService.getTitle(body.data);
     return {
       title,
-      status: EProcessTextStatus.COMPLETED,
+      status: EProcessTextStatus.QUEUED,
     };
   }
 }

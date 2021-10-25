@@ -67,7 +67,7 @@ describe("TitleController (e2e)", () => {
         .expect(201)
         .expect({
           title: "Here is a title",
-          status: "completed",
+          status: "queued",
         });
     });
   });
