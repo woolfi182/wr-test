@@ -62,6 +62,8 @@ export class TitleController {
     // To make search faster, let's generate hashes
     const uniqueName = await generateUniqueHash(body.data);
 
+    await this.titleService.generateTitle(body.data);
+
     // Check whether we have processed the chunk before
     // If so, there is nothing to do here
     const processedData = await this.titleService.getTitleData(uniqueName);

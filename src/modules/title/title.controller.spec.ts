@@ -6,6 +6,7 @@ import { Title } from "./models";
 
 import { TitleController } from "./title.controller";
 import { TitleService } from "./title.service";
+import { ConfigsModule } from "../../configs/configs.module";
 
 class TitleModel {
   constructor(private data) {}
@@ -26,6 +27,7 @@ describe("TitleController", () => {
   beforeEach(async () => {
     await mongo.clearDatabase();
     const app: TestingModule = await Test.createTestingModule({
+      imports: [ConfigsModule],
       controllers: [TitleController],
       providers: [
         TitleService,
@@ -47,6 +49,7 @@ describe("TitleController", () => {
       const body = {
         data: "any data",
       };
+
       const res = await titleController.handleDataForTitle(body);
       expect(res).toStrictEqual({
         status: "queued",
