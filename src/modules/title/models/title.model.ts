@@ -26,7 +26,7 @@ export class Title {
     index: true,
     enum: EProcessingStatus,
   })
-  status: string;
+  status: EProcessingStatus;
 }
 
 export type TitleDocument = Title & Document;

@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
 import { Title, TitleDocument } from "./models";
-import { EProcessingStatus } from "./output";
+import { EProcessingStatus, EResponseStatus } from "./output";
 
 @Injectable()
 export class TitleService {
@@ -66,5 +66,11 @@ export class TitleService {
         return el.save();
       }),
     );
+  }
+
+  getResponseStatus(status: EProcessingStatus): EResponseStatus {
+    return status === EProcessingStatus.PROCESSING
+      ? EResponseStatus.QUEUED
+      : (status as any as EResponseStatus);
   }
 }

@@ -23,6 +23,7 @@ import {
   InternalServerErrorOutput,
   DataForTitleOutput,
   EResponseStatus,
+  EProcessingStatus,
 } from "./output";
 import { generateUniqueHash } from "../../helpers/hash";
 import { TasksService } from "../tasks/tasks.service";
@@ -75,7 +76,7 @@ export class TitleController {
       // TODO: save to cache for future
 
       return {
-        status: processedData.status as EResponseStatus,
+        status: this.titleService.getResponseStatus(processedData.status),
         title: processedData.title,
       };
     }
