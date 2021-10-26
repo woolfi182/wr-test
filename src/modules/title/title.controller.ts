@@ -25,6 +25,7 @@ import {
   DataForTitleOutput,
 } from "./output";
 import { generateUniqueHash } from "../../helpers/hash";
+import { TasksService } from "../tasks/tasks.service";
 
 @ApiTags("Generate Title")
 @Controller({
@@ -32,7 +33,10 @@ import { generateUniqueHash } from "../../helpers/hash";
   version: VERSION_NEUTRAL,
 })
 export class TitleController {
-  constructor(private readonly titleService: TitleService) {}
+  constructor(
+    private readonly titleService: TitleService,
+    private tasksService: TasksService,
+  ) {}
 
   /**
    * Process text for generating title handler
@@ -62,7 +66,7 @@ export class TitleController {
     // To make search faster, let's generate hashes
     const uniqueName = await generateUniqueHash(body.data);
 
-    await this.titleService.generateTitle(body.data);
+    await this.tasksService.checkIfTriggerTask();
 
     // Check whether we have processed the chunk before
     // If so, there is nothing to do here
