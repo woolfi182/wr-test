@@ -20,9 +20,9 @@ import { TitleService } from "./title.service";
 import { DataForTitleInput } from "./input";
 import {
   BadRequestOutput,
-  EProcessingStatus,
   InternalServerErrorOutput,
   DataForTitleOutput,
+  EResponseStatus,
 } from "./output";
 import { generateUniqueHash } from "../../helpers/hash";
 import { TasksService } from "../tasks/tasks.service";
@@ -66,22 +66,26 @@ export class TitleController {
     // To make search faster, let's generate hashes
     const uniqueName = await generateUniqueHash(body.data);
 
-    await this.tasksService.checkIfTriggerTask();
+    // TODO: fetch from cache
 
     // Check whether we have processed the chunk before
     // If so, there is nothing to do here
     const processedData = await this.titleService.getTitleData(uniqueName);
     if (processedData) {
+      // TODO: save to cache for future
+
       return {
-        status: processedData.status as EProcessingStatus,
+        status: processedData.status as EResponseStatus,
         title: processedData.title,
       };
     }
 
     // Chunk has newer been handeled before
     await this.titleService.saveDataForTitle(uniqueName, body.data);
+
+    // TODO: Save to cache for future
     return {
-      status: EProcessingStatus.QUEUED,
+      status: EResponseStatus.QUEUED,
     };
   }
 }

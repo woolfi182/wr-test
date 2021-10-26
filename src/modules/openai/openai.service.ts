@@ -1,7 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import axios, { AxiosInstance } from "axios";
+import { title } from "process";
 
 import { AppConfigService } from "../../configs/app/app.service";
+import { TitleDocument } from "../title/models";
 
 @Injectable()
 export class OpenAiService {
@@ -17,6 +19,7 @@ export class OpenAiService {
     this.openai = axios.create({
       baseURL: url,
       headers,
+      timeout: 10000, // Timeout 10 sec otherwise - error and retrigger
       withCredentials: true,
     });
   }
@@ -30,7 +33,7 @@ export class OpenAiService {
 
   async fetchTitleFromOpenAi(text: string): Promise<string> {
     const { data } = await this.openai.post("/v1/engines/davinci/completions", {
-      prompt: `Q: Here is the text\n\n"""\n${text}\n"""\n\nWhat title is a good fit?\nA:`,
+      prompt: `Q: Here is a dialogue\n\n"""\n${text}\n"""\n\nWhat short title is a good fit?\nA:`,
       max_tokens: 100,
       temperature: 0,
       top_p: 1,
@@ -68,6 +71,24 @@ export class OpenAiService {
 
       return chunk.slice(textStartPos, textEndPos);
     });
-    return words.join();
+
+    const probableTitle = words.join(" ");
+
+    const answRegEx = /^I?\s*think\s*the\s*short\s*title\s*is\s*\\"\s*/;
+
+    if (answRegEx.test(probableTitle)) {
+      return probableTitle.replace(answRegEx, "").replace(/"$/, "");
+    }
+
+    return probableTitle;
+  }
+
+  async getTitlesForElements(elements: TitleDocument[]): Promise<string[]> {
+    return Promise.all(
+      elements.map((el) => {
+        const text = el.text;
+        return this.generateTitle(text);
+      }),
+    );
   }
 }

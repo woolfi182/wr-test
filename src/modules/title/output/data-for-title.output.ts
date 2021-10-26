@@ -5,6 +5,13 @@ export enum EProcessingStatus {
   COMPLETED = "completed",
   ERROR = "error",
   QUEUED = "queued",
+  PROCESSING = "processing",
+}
+
+export enum EResponseStatus {
+  COMPLETED = "completed",
+  ERROR = "error",
+  QUEUED = "queued",
 }
 
 export class DataForTitleOutput {
@@ -17,8 +24,8 @@ export class DataForTitleOutput {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
-    enum: EProcessingStatus,
+    enum: EResponseStatus,
     required: true,
   })
-  status!: EProcessingStatus;
+  status!: EResponseStatus;
 }

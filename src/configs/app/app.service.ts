@@ -24,6 +24,10 @@ export class AppConfigService {
     return this.configService.get<string>("app.openaiApiKey");
   }
 
+  get openaiRate(): number {
+    return this.configService.get<number>("app.openaiRate");
+  }
+
   /**
    * Chech if the ENV is prod-like
    * @returns true/false

@@ -39,4 +39,32 @@ export class TitleService {
     await createdTitleData.save();
     return null;
   }
+
+  async getNElementsToProcess(elsAmount: number): Promise<TitleDocument[]> {
+    // TODO: should we process Errors?
+    const findParams = {
+      status: EProcessingStatus.QUEUED,
+    };
+    const filterParams = {
+      text: 1,
+      status: 1,
+    };
+    const opts = {
+      sort: { createdAt: 1 },
+      limit: elsAmount,
+    };
+    return this.titleModel.find(findParams, filterParams, opts);
+  }
+
+  async updateElementsStatus(
+    status: EProcessingStatus,
+    elements: TitleDocument[],
+  ): Promise<void> {
+    await Promise.all(
+      elements.map((el) => {
+        el.status = status;
+        return el.save();
+      }),
+    );
+  }
 }
