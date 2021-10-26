@@ -8,6 +8,10 @@ As an example, we send transcribed audio content to the OpenAI API to generate a
 
 Also we allowing querying the status of each request e.g. `queued`, `complete`, `error`
 
+### How it works
+
+![Schema](./schema.png "Schema of services")
+
 ## Installation
 
 ```sh
