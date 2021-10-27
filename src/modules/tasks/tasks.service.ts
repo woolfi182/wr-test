@@ -17,6 +17,7 @@ enum ETaskStatus {
   SUCCESS,
   SKIPPED,
 }
+
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
