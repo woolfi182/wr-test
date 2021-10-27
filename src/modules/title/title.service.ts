@@ -46,6 +46,7 @@ export class TitleService {
       status: EProcessingStatus.QUEUED,
     };
     const filterParams = {
+      hash: 1,
       text: 1,
       status: 1,
     };

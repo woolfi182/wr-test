@@ -1,5 +1,12 @@
-import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
-import { SchedulerRegistry, Interval } from "@nestjs/schedule";
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+  CACHE_MANAGER,
+} from "@nestjs/common";
+import { Interval } from "@nestjs/schedule";
+import { Cache } from "cache-manager";
 
 import { AppConfigService } from "../../configs/app/app.service";
 import { OpenAiService } from "../openai/openai.service";
@@ -16,21 +23,13 @@ export class TasksService {
   interval = 5; // 5 sec
 
   constructor(
-    private schedulerRegistry: SchedulerRegistry,
     private openaiService: OpenAiService,
     @Inject(forwardRef(() => TitleService))
     private titleService: TitleService,
     private appConfigService: AppConfigService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
-
-  addInterval() {
-    const callback = () => {
-      this.logger.warn("Interval executing at time (1 sec!");
-    };
-
-    const fetchDataInterval = setInterval(callback, 1000);
-    this.schedulerRegistry.addInterval("rate", fetchDataInterval);
-  }
 
   /**
    * Trigger of the processing task
@@ -92,7 +91,15 @@ export class TasksService {
       elsWithTitles,
     );
 
-    // TODO: update cache
+    // Update cache
+    await Promise.all(
+      elsWithTitles.map((el) =>
+        this.cacheManager.set(el.hash, {
+          title: el.title,
+          status: EProcessingStatus.COMPLETED,
+        }),
+      ),
+    );
 
     return ETaskStatus.SUCCESS;
   }

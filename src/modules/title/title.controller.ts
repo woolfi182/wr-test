@@ -3,7 +3,9 @@ import {
   Controller,
   HttpCode,
   Post,
+  Inject,
   ValidationPipe,
+  CACHE_MANAGER,
   VERSION_NEUTRAL,
 } from "@nestjs/common";
 import {
@@ -14,6 +16,7 @@ import {
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
+import { Cache } from "cache-manager";
 
 import { TitleService } from "./title.service";
 
@@ -23,10 +26,8 @@ import {
   InternalServerErrorOutput,
   DataForTitleOutput,
   EResponseStatus,
-  EProcessingStatus,
 } from "./output";
 import { generateUniqueHash } from "../../helpers/hash";
-import { TasksService } from "../tasks/tasks.service";
 
 @ApiTags("Generate Title")
 @Controller({
@@ -36,7 +37,8 @@ import { TasksService } from "../tasks/tasks.service";
 export class TitleController {
   constructor(
     private readonly titleService: TitleService,
-    private tasksService: TasksService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
   /**
@@ -67,26 +69,40 @@ export class TitleController {
     // To make search faster, let's generate hashes
     const uniqueName = await generateUniqueHash(body.data);
 
-    // TODO: fetch from cache
+    // Fetch from cache
+    const cachedRes = await this.cacheManager.get<DataForTitleOutput>(
+      uniqueName,
+    );
+    if (cachedRes) {
+      return cachedRes;
+    }
 
     // Check whether we have processed the chunk before
     // If so, there is nothing to do here
     const processedData = await this.titleService.getTitleData(uniqueName);
     if (processedData) {
-      // TODO: save to cache for future
-
-      return {
+      const responseData = {
         status: this.titleService.getResponseStatus(processedData.status),
         title: processedData.title,
       };
+
+      // Save to cache for future
+      await this.cacheManager.set(uniqueName, responseData);
+
+      return responseData;
     }
 
     // Chunk has newer been handeled before
     await this.titleService.saveDataForTitle(uniqueName, body.data);
 
-    // TODO: Save to cache for future
-    return {
+    // Save to cache for future
+    const responseData = {
       status: EResponseStatus.QUEUED,
     };
+
+    // Save to cache for future
+    await this.cacheManager.set(uniqueName, responseData);
+
+    return responseData;
   }
 }
